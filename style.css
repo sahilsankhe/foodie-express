@@ -1,0 +1,21 @@
+/* Custom CSS for Food Ordering System */
+
+/* Hero Banner Styling */
+.hero-section {
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
+                url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200');
+    background-size: cover;
+    background-position: center;
+    height: 70vh;
+}
+
+/* Card Images Fixed Height */
+.food-img {
+    height: 200px;
+    object-fit: cover;
+}
+
+/* Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
+}
