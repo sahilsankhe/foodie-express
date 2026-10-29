@@ -29,9 +29,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         
-        // Skip filtering for auth routes so 403 never occurs on login
         String path = request.getRequestURI();
-        if (path.startsWith("/api/auth/")) {
+        
+        // Hya mule /api/auth/ ani /api/foods (sagle /api/** routes) sathi 403 error yenarach nahi!
+        if (path.startsWith("/api/auth/") || path.startsWith("/api/foods")) {
             filterChain.doFilter(request, response);
             return;
         }
