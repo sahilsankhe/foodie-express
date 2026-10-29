@@ -7,7 +7,7 @@ function Login({ onLoginSuccess }) {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    fetch('http://localhost:8081/api/auth/login', {
+    fetch('https://foodie-express-385k.onrender.com/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
