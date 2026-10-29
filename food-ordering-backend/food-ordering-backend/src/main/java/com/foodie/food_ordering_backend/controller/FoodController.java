@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/foods")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"})
+@CrossOrigin(origins = "*") // Hya mukhya change mule Vercel chya requests allow hotil!
 public class FoodController {
 
     @Autowired
