@@ -23,7 +23,7 @@ function Login({ onLoginSuccess }) {
           setError('Invalid Email or Password!');
         }
       })
-      .catch(() => setError('Server Error! Make sure Backend is running on port 8081.'));
+      .catch(() => setError('Server Error! Unable to connect to the backend server.'));
   };
 
   return (
