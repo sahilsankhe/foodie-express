@@ -1,7 +1,13 @@
 import axios from 'axios';
 
-const REST_API_BASE_URL = 'http://localhost:8080/api/food';
+// Render var deploy kelela live backend URL
+const API_BASE_URL = "https://foodie-express-385k.onrender.com";
 
-export const getFoodItems = () => {
-    return axios.get(REST_API_BASE_URL);
-};
+const axiosInstance = axios.create({
+    baseURL: API_BASE_URL,
+    headers: {
+        "Content-Type": "application/json"
+    }
+});
+
+export default axiosInstance;
