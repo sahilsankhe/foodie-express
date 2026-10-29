@@ -1,4 +1,4 @@
-package com.example.foodordering.config;
+package com.foodie.food_ordering_backend;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
