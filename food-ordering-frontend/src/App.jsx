@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
 
+const API_BASE_URL = 'https://foodie-express-385k.onrender.com/api';
+
 function App() {
   const [foods, setFoods] = useState([]);
   const [cart, setCart] = useState([]);
@@ -9,15 +11,12 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [sortOption, setSortOption] = useState('default');
-  const [activeTab, setActiveTab] = useState('home'); // home, menu, orders, admin
+  const [activeTab, setActiveTab] = useState('home');
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
-  // Reviews State
   const [reviews, setReviews] = useState({});
   const [newReview, setNewReview] = useState({ foodId: null, userName: '', rating: 5, comment: '' });
-
-  // Admin Form State (Added imageUrl field)
   const [newFood, setNewFood] = useState({ foodName: '', category: 'Main Course', price: '', location: 'Mumbai', imageUrl: '' });
 
   useEffect(() => {
@@ -26,7 +25,7 @@ function App() {
   }, []);
 
   const fetchFoods = () => {
-    axios.get('http://localhost:8080/api/foods')
+    axios.get(`${API_BASE_URL}/foods`)
       .then((res) => {
         setFoods(res.data || []);
         res.data.forEach(item => fetchReviews(item.id));
@@ -35,13 +34,13 @@ function App() {
   };
 
   const fetchOrders = () => {
-    axios.get('http://localhost:8080/api/orders')
+    axios.get(`${API_BASE_URL}/orders`)
       .then((res) => setOrders(res.data || []))
       .catch((err) => console.error('Error fetching orders:', err));
   };
 
   const fetchReviews = (foodId) => {
-    axios.get(`http://localhost:8080/api/reviews/${foodId}`)
+    axios.get(`${API_BASE_URL}/reviews/${foodId}`)
       .then((res) => {
         setReviews(prev => ({ ...prev, [foodId]: res.data || [] }));
       })
@@ -69,7 +68,6 @@ function App() {
 
   const cartTotal = cart.reduce((sum, item) => sum + (item.price || 0) * item.qty, 0);
 
-  // Payment & Checkout Flow
   const handlePaymentAndCheckout = () => {
     if (cart.length === 0) return alert("Cart is empty!");
     
@@ -84,7 +82,7 @@ function App() {
       }))
     };
 
-    axios.post('http://localhost:8080/api/orders/place', orderPayload)
+    axios.post(`${API_BASE_URL}/orders/place`, orderPayload)
       .then(() => {
         alert("🎉 Payment Successful via Razorpay Gateway!\nOrder placed successfully!");
         setCart([]);
@@ -96,7 +94,6 @@ function App() {
       .catch((err) => alert("Failed to place order. " + err.message));
   };
 
-  // Add Review Submit
   const handleReviewSubmit = (foodId, e) => {
     e.preventDefault();
     if (!newReview.userName || !newReview.comment) return alert("Please fill name and comment!");
@@ -108,20 +105,19 @@ function App() {
       comment: newReview.comment
     };
 
-    axios.post('http://localhost:8080/api/reviews', payload)
+    axios.post(`${API_BASE_URL}/reviews`, payload)
       .then(() => {
         alert("Review added successfully!");
         setNewReview({ foodId: null, userName: '', rating: 5, comment: '' });
         fetchReviews(foodId);
       })
-      .catch(err => alert("Error adding review"));
+      .catch(() => alert("Error adding review"));
   };
 
-  // Admin Add/Delete Food
   const handleAddFood = (e) => {
     e.preventDefault();
     if (!newFood.foodName || !newFood.price) return alert("Please fill all details!");
-    axios.post('http://localhost:8080/api/foods', newFood)
+    axios.post(`${API_BASE_URL}/foods`, newFood)
       .then(() => {
         alert("Food item added successfully!");
         setNewFood({ foodName: '', category: 'Main Course', price: '', location: 'Mumbai', imageUrl: '' });
@@ -131,13 +127,13 @@ function App() {
 
   const handleDeleteFood = (id) => {
     if (window.confirm("Delete this food item?")) {
-      axios.delete(`http://localhost:8080/api/foods/${id}`)
+      axios.delete(`${API_BASE_URL}/foods/${id}`)
         .then(() => fetchFoods());
     }
   };
 
   const handleStatusUpdate = (orderId, status) => {
-    axios.put(`http://localhost:8080/api/orders/${orderId}/status?status=${status}`)
+    axios.put(`${API_BASE_URL}/orders/${orderId}/status?status=${status}`)
       .then(() => fetchOrders());
   };
 
@@ -166,7 +162,6 @@ function App() {
 
   return (
     <div className="swiggy-app">
-      {/* Navbar */}
       <header className="swiggy-navbar">
         <div className="nav-container">
           <div className="brand-section">
@@ -183,7 +178,6 @@ function App() {
         </div>
       </header>
 
-      {/* Hero Section */}
       {activeTab === 'home' && (
         <section className="swiggy-hero">
           <div className="hero-content">
@@ -194,10 +188,7 @@ function App() {
         </section>
       )}
 
-      {/* Main Content Area */}
       <main className="main-wrapper">
-        
-        {/* VIEW 1: MENU & DISHES WITH REVIEWS */}
         {(activeTab === 'home' || activeTab === 'menu') && (
           <>
             <div className="filter-bar">
@@ -231,13 +222,12 @@ function App() {
                   </div>
                   <div className="card-info">
                     <h3>{item.foodName}</h3>
-                    <p className="cat-text">{item.category} • 📍 {item.location || 'Local'}</p>
+                    <p className="cat-text">{item.category} 📍 {item.location || 'Local'}</p>
                     <div className="card-footer-row">
                       <span className="price-tag">₹{item.price}</span>
                       <button className="swiggy-add-btn" onClick={() => addToCart(item)}>ADD +</button>
                     </div>
 
-                    {/* Ratings & Reviews Section inside Card */}
                     <div className="reviews-box" style={{marginTop: '15px', borderTop: '1px solid #eee', paddingTop: '10px'}}>
                       <h4 style={{fontSize: '0.9rem', marginBottom: '6px'}}>Customer Reviews:</h4>
                       <div className="review-list" style={{maxHeight: '80px', overflowY: 'auto', fontSize: '0.8rem', marginBottom: '8px'}}>
@@ -287,7 +277,6 @@ function App() {
           </>
         )}
 
-        {/* VIEW 2: MY ORDERS, LIVE TRACKING & INVOICE DOWNLOAD */}
         {activeTab === 'orders' && (
           <section className="orders-section">
             <h2>Your Order History & Invoices</h2>
@@ -316,7 +305,7 @@ function App() {
                   <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '15px'}}>
                     <h4 className="total-text">Total Paid: ₹{order.totalAmount} ({order.paymentMethod})</h4>
                     <button 
-                      onClick={() => window.open(`http://localhost:8080/api/orders/${order.id}/invoice`)}
+                      onClick={() => window.open(`${API_BASE_URL}/orders/${order.id}/invoice`)}
                       style={{ background: '#fc8019', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}
                     >
                       📄 Download Invoice
@@ -328,7 +317,6 @@ function App() {
           </section>
         )}
 
-        {/* VIEW 3: ADMIN PANEL */}
         {activeTab === 'admin' && (
           <section className="admin-section">
             <h2>Admin Dashboard - Food & Order Management</h2>
@@ -373,7 +361,6 @@ function App() {
         )}
       </main>
 
-      {/* CART DRAWER */}
       {isCartOpen && (
         <div className="cart-overlay" onClick={() => setIsCartOpen(false)}>
           <div className="cart-drawer" onClick={e=>e.stopPropagation()}>
@@ -405,7 +392,6 @@ function App() {
         </div>
       )}
 
-      {/* PAYMENT GATEWAY MODAL */}
       {isPaymentModalOpen && (
         <div className="payment-modal-overlay">
           <div className="payment-modal">
